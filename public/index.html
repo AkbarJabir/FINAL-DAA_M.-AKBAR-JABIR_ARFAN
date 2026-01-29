@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Jadwal Kuliah Optimizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1e3fae",
+            "secondary": "#3B82F6",
+            "background-light": "#f6f6f8",
+            "background-dark": "#121520",
+            "surface-light": "#ffffff",
+            "surface-dark": "#1e2330",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    .glass-header {
+      background: linear-gradient(90deg, rgba(30, 63, 174, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* Animation for results */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-card {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-background-light dark:bg-background-dark font-display text-[#121317] dark:text-gray-100 flex flex-col min-h-screen">
+  <!-- Header -->
+  <header class="glass-header fixed top-0 w-full z-50 border-b border-white/10 shadow-lg transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm shadow-inner">
+            <span class="material-symbols-outlined text-white" style="font-size: 24px;">school</span>
+          </div>
+          <h1 class="text-white text-lg font-bold tracking-tight">JADWAL KULIAH OPTIMIZER</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="bg-center bg-no-repeat bg-cover rounded-full size-9 border-2 border-white/30"
+            style='background-image: url("https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"); background-color: white;'>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Main Content -->
+  <main class="flex-grow pt-24 pb-10 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- Left Column: Course List -->
+      <div class="lg:col-span-8 space-y-6">
+        <!-- Headline -->
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Daftar Mata Kuliah</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Daftar semua mata kuliah yang tersedia untuk
+              semester ini.</p>
+          </div>
+          <button onclick="openAddModal()"
+            class="flex items-center gap-2 text-primary font-medium hover:text-blue-700 text-sm transition-colors bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <span class="material-symbols-outlined text-[20px]">add_circle</span>
+            Tambah Manual
+          </button>
+        </div>
+        <!-- Table Card -->
+        <div
+          class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <tr>
+                  <th class="px-6 py-4 font-semibold text-gray-700 dark:text-gray-200 w-[100px]">Kode</th>
+                  <th class="px-6 py-4 font-semibold text-gray-700 dark:text-gray-200">Mata Kuliah</th>
+                  <th class="px-6 py-4 font-semibold text-gray-700 dark:text-gray-200 w-[80px] text-center">Smt</th>
+                  <th class="px-6 py-4 font-semibold text-gray-700 dark:text-gray-200 w-[120px]">Hari</th>
+                  <th class="px-6 py-4 font-semibold text-gray-700 dark:text-gray-200 w-[150px]">Jam</th>
+                  <th class="px-6 py-4 font-semibold text-gray-700 dark:text-gray-200 w-[80px] text-center">SKS</th>
+                  <th class="px-6 py-4 font-semibold text-gray-700 dark:text-gray-200 w-[50px]"></th>
+                </tr>
+              </thead>
+              <tbody id="course-table-body" class="divide-y divide-gray-100 dark:divide-gray-700">
+                <!-- Courses will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Right Column: Settings -->
+      <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white pl-1">Atur Parameter</h2>
+        <div
+          class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <form id="optimize-form" class="flex flex-col gap-6" onsubmit="event.preventDefault()">
+
+            <!-- Semester Dropdown -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Semester
+              </label>
+              <div class="relative">
+                <select id="semester-select"
+                  class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary h-12">
+                  <option value="1">Semester 1 (Ganjil)</option>
+                  <option value="2">Semester 2 (Genap)</option>
+                  <option selected="" value="3">Semester 3 (Ganjil)</option>
+                  <option value="4">Semester 4 (Genap)</option>
+                  <option value="5">Semester 5 (Ganjil)</option>
+                  <option value="6">Semester 6 (Genap)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Max SKS Input -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Maksimal SKS
+              </label>
+              <div class="relative">
+                <input id="max-sks"
+                  class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary h-12 pr-12"
+                  max="24" min="10" type="number" value="24" />
+                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400">
+                  <span class="text-sm font-medium">SKS</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500">Batas SKS maksimum yang diizinkan.</p>
+            </div>
+            <!-- Divider -->
+            <div class="h-px bg-gray-100 dark:bg-gray-700 my-2"></div>
+
+            <!-- Action Button -->
+            <button
+              class="w-full bg-primary hover:bg-blue-800 text-white font-bold py-4 rounded-lg shadow-lg shadow-blue-500/30 transform transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-4 ring-offset-2 focus:ring-2 focus:ring-primary"
+              type="submit">
+              <span class="material-symbols-outlined">search_check</span>
+              Cari Kombinasi
+            </button>
+          </form>
+        </div>
+        <!-- Info Card -->
+        <div
+          class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg p-4 flex gap-3">
+          <span class="material-symbols-outlined text-primary shrink-0">info</span>
+          <p class="text-sm text-blue-900 dark:text-blue-200 leading-snug">
+            Algoritma backtracking akan mencari kombinasi jadwal tanpa bentrok berdasarkan preferensi Anda.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom Section: Results -->
+    <div id="results-section" class="mt-12 space-y-6 hidden">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Hasil Kombinasi</h2>
+          <span
+            class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span id="result-count">0 Opsi Ditemukan</span>
+          </span>
+        </div>
+      </div>
+      <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Results will be injected here -->
+      </div>
+    </div>
+  </main>
+  <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-auto">
+    <div
+      class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-sm text-gray-500">© 2026 Jadwal Kuliah Optimizer. Optimized for academic success.</p>
+    </div>
+  </footer>
+
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div
+          class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+          <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                <h3 class="text-xl font-semibold leading-6 text-gray-900 dark:text-white mb-4" id="modal-title">Detail
+                  Jadwal</h3>
+                <div class="mt-2 overflow-x-auto">
+                  <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th class="px-3 py-2">Mata Kuliah</th>
+                        <th class="px-3 py-2 text-center">Smt</th>
+                        <th class="px-3 py-2">Hari</th>
+                        <th class="px-3 py-2">Jam</th>
+                        <th class="px-3 py-2 text-center">SKS</th>
+                      </tr>
+                    </thead>
+                    <tbody id="modal-content" class="divide-y divide-gray-100 dark:divide-gray-600">
+                      <!-- Content -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <button type="button"
+              class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-600 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-500 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              onclick="closeModal()">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Course Modal -->
+  <div id="add-course-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity" onclick="closeAddModal()"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div
+          class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+          <form id="add-course-form">
+            <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+              <h3 class="text-xl font-semibold leading-6 text-gray-900 dark:text-white mb-4">Tambah Mata Kuliah</h3>
+              <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kode</label>
+                    <input type="text" name="code" required
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">SKS</label>
+                    <input type="number" name="sks" required min="1" max="6"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Mata Kuliah</label>
+                  <input type="text" name="name" required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hari</label>
+                    <select name="day"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                      <option>Senin</option>
+                      <option>Selasa</option>
+                      <option>Rabu</option>
+                      <option>Kamis</option>
+                      <option>Jumat</option>
+                      <option>Sabtu</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Semester</label>
+                    <select name="semester"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3" selected>3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                      <option value="8">8</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jam Mulai</label>
+                    <input type="time" name="start_time" required
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jam Selesai</label>
+                    <input type="time" name="end_time" required
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <button type="submit"
+                class="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 sm:ml-3 sm:w-auto">Simpan</button>
+              <button type="button"
+                class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-600 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-500 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                onclick="closeAddModal()">Batal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
